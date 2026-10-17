@@ -1,7 +1,7 @@
 import { CARDS, ABILITIES, matches, reqText } from './cards.js?v=2';
 import { newGame, act, matching, reqOf, furyLeft, score, D, DIFFS, DIFF_DESC, MAX_PLAYERS, COLORS } from './game.js?v=2';
 import { dieSVG, reqHTML, HEART, SKULL } from './art.js?v=2';
-import { DEFS, monsterArt, preloadMonsters } from './bestiary.js?v=3';
+import { DEFS, monsterArt, preloadMonsters } from './bestiary.js?v=4';
 import * as net from './net.js?v=2';
 
 const $ = s => document.querySelector(s);
@@ -613,30 +613,53 @@ function renderTable() {
 
 function renderPlayers() {
   const s = app.state;
+  // Боковая панель: кто в отряде и сколько у него карт.
   $('#players').replaceChildren(...s.players.map((p, pi) => {
     const box = document.createElement('div');
     box.className = 'pl' + (pi === s.turn && s.phase === 'play' ? ' turn' : '') + (isOnline(p.key) ? '' : ' off');
     const me = app.kind === 'online' && p.key === app.myKey;
-    box.innerHTML = `<div class="ph"><span class="dot" style="background:${p.color}"></span><span class="nm"></span><small>армия: ${p.army.length}</small></div><div class="army"></div>`;
+    box.innerHTML = `<div class="ph"><span class="dot" style="background:${p.color}"></span><span class="nm"></span><small>карт в армии: ${p.army.length}</small></div>`;
     box.querySelector('.nm').textContent = p.name + (me ? ' (вы)' : '') + (isOnline(p.key) ? '' : ' · не в сети');
-    const army = box.querySelector('.army');
-    const usable = canUseArmy(pi);
-    if (!p.army.length) army.innerHTML = '<span class="empty">Армия пуста — побеждайте чудовищ</span>';
+    return box;
+  }));
+  renderArmies();
+}
+
+// Побеждённые чудовища — карточки армии под кубиками: нажмите на карту, затем на кубик.
+function renderArmies() {
+  const s = app.state;
+  const box = $('#armies');
+  const order = s.players.map((_, i) => i).sort((a, b) => (a === s.turn ? -1 : b === s.turn ? 1 : 0));
+  const groups = order.map(pi => {
+    const p = s.players[pi];
+    const usable = canUseArmy(pi) && s.phase === 'play';
+    const g = document.createElement('div');
+    g.className = 'agroup' + (pi === s.turn ? ' turn' : '');
+    const me = app.kind === 'online' && p.key === app.myKey;
+    g.innerHTML = '<div class="ah"><span class="dot"></span><b></b><small></small></div><div class="acards"></div>';
+    g.querySelector('.dot').style.background = p.color;
+    g.querySelector('b').textContent = 'Армия: ' + p.name + (me ? ' (вы)' : '');
+    g.querySelector('small').textContent = p.army.length ? (usable ? 'нажмите карту, чтобы применить' : 'ждёт своего владельца') : '';
+    const row = g.querySelector('.acards');
+    if (!p.army.length) row.innerHTML = '<span class="empty">Пока пусто. Побеждённые чудовища попадут сюда и помогут менять кубики.</span>';
     p.army.forEach((id, i) => {
       const c = CARDS[id], a = ABILITIES[c.ab];
       const b = document.createElement('button');
       b.type = 'button';
       const pend = app.pend && app.pend.p === pi && app.pend.i === i;
-      b.className = 'acard' + (usable ? ' use' : '') + (pend ? ' pend' : '');
+      const wait = !s.dice && c.ab !== '#';
+      b.className = 'acard2' + (usable ? ' use' : '') + (pend ? ' pend' : '') + (usable && wait ? ' wait' : '');
       b.disabled = !usable;
-      b.title = `${c.name}: ${a.name} — ${a.desc}`;
-      b.innerHTML = `<span class="ai">${a.icon}</span><span class="an"></span>`;
-      b.querySelector('.an').textContent = a.name;
+      b.title = `${c.name}: ${a.name}. ${a.desc[0].toUpperCase() + a.desc.slice(1)}.`;
+      b.innerHTML = monsterArt(id, c.name) + `<span class="ab2">${a.icon}</span><span class="nm2"></span><span class="ds2"></span>`;
+      b.querySelector('.nm2').textContent = c.name;
+      b.querySelector('.ds2').textContent = a.desc;
       b.onclick = () => clickArmy(pi, i);
-      army.append(b);
+      row.append(b);
     });
-    return box;
-  }));
+    return g;
+  });
+  box.replaceChildren(...groups);
 }
 
 function renderFinal() {
