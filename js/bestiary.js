@@ -418,12 +418,17 @@ export const DEFS = `<svg width="0" height="0" style="position:absolute" aria-hi
 </defs></svg>`;
 
 // Готовые картинки: номер карты -> файл в img/monsters/. Нет файла — рисуем гравюру сами.
-export const IMAGES = new Set([]);
+export const IMAGES = new Set(Array.from({ length: 41 }, (_, i) => i));
 const IMG_V = 1;
 
 export function monsterArt(id, name = '') {
-  if (IMAGES.has(id)) return `<img class="monster" src="img/monsters/${id}.webp?v=${IMG_V}" alt="${name}" loading="lazy" draggable="false">`;
+  if (IMAGES.has(id)) return `<img class="monster" src="img/monsters/${id}.webp?v=${IMG_V}" alt="${name}" draggable="false">`;
   return monsterSVG(id);
+}
+
+// Подгрузить все картинки заранее, чтобы новые карты появлялись сразу.
+export function preloadMonsters() {
+  for (const id of IMAGES) { const im = new Image(); im.src = `img/monsters/${id}.webp?v=${IMG_V}`; }
 }
 
 export function monsterSVG(id) {

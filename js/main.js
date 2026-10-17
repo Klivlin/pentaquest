@@ -1,7 +1,7 @@
 import { CARDS, ABILITIES, matches, reqText } from './cards.js?v=2';
 import { newGame, act, matching, reqOf, furyLeft, score, D, DIFFS, DIFF_DESC, MAX_PLAYERS, COLORS } from './game.js?v=2';
 import { dieSVG, reqHTML, HEART, SKULL } from './art.js?v=2';
-import { DEFS, monsterArt } from './bestiary.js?v=2';
+import { DEFS, monsterArt, preloadMonsters } from './bestiary.js?v=3';
 import * as net from './net.js?v=2';
 
 const $ = s => document.querySelector(s);
@@ -711,5 +711,6 @@ window.addEventListener('keydown', e => {
 setInterval(() => { if (app.kind === 'online') update(); }, 5000);
 
 document.body.insertAdjacentHTML('afterbegin', DEFS);
+setTimeout(preloadMonsters, 1500);
 initChat();
 initMenu();
