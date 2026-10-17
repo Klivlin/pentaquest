@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#1f1830">
+  <meta name="author" content="Klivlin">
+  <meta name="description" content="Неофициальная фанатская кооперативная онлайн-игра с кубиками и чудовищами. © 2026 Klivlin.">
+  <title>Пентаквест — кооператив</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 10'><rect width='10' height='10' rx='2' fill='%237b4fd6'/><circle cx='3' cy='3' r='1' fill='white'/><circle cx='7' cy='3' r='1' fill='white'/><circle cx='5' cy='5' r='1' fill='white'/><circle cx='3' cy='7' r='1' fill='white'/><circle cx='7' cy='7' r='1' fill='white'/></svg>">
+  <link rel="stylesheet" href="style.css?v=1">
+  <script src="https://unpkg.com/mqtt@5.10.1/dist/mqtt.min.js"></script>
+</head>
+<body>
+  <section id="menu" class="screen page">
+    <div class="card">
+      <div class="head">
+        <h1>Пентаквест</h1>
+        <button class="theme-toggle icon" title="Сменить тему">🌙</button>
+      </div>
+      <p class="sub">Кооператив: пять кубиков, отряд друзей и орда чудовищ. Вместе против Повелителя Тьмы.</p>
+      <label>Ваше имя <input id="name" maxlength="16" placeholder="Например, Аня" autocomplete="nickname"></label>
+      <div id="resume"></div>
+      <h2>Сложность</h2>
+      <div id="diffs" class="modes"></div>
+      <h2>Онлайн</h2>
+      <button id="btn-host" class="primary">Создать комнату</button>
+      <div class="row">
+        <input id="code" maxlength="5" placeholder="Код комнаты" autocapitalize="characters">
+        <button id="btn-join">Войти</button>
+      </div>
+      <h2>На одном устройстве</h2>
+      <div id="local-names"></div>
+      <button id="btn-local">Начать поход</button>
+      <p id="menu-msg" class="msg"></p>
+      <details class="rules"></details>
+      <p class="legal">© 2026 Klivlin. Все права защищены.<br>
+        Неофициальная фанатская некоммерческая версия. Не связана с авторами и издателями Pentaquest и с Board Game Arena.
+        Товарные знаки принадлежат их правообладателям. Вся графика нарисована с нуля.</p>
+    </div>
+  </section>
+
+  <section id="lobby" class="screen page hidden">
+    <div class="card">
+      <div class="head">
+        <h1>Комната <span id="lobby-code" class="code"></span></h1>
+        <button class="theme-toggle icon" title="Сменить тему">🌙</button>
+      </div>
+      <p>Отправьте друзьям ссылку:</p>
+      <div class="row"><input id="invite" readonly><button id="btn-copy">Копировать</button></div>
+      <h2>Отряд (до 5 героев)</h2>
+      <ul id="lobby-players" class="plist"></ul>
+      <h2>Сложность</h2>
+      <div id="lobby-diffs" class="modes"></div>
+      <p id="lobby-wait" class="muted"></p>
+      <button id="btn-start" class="primary">Начать поход</button>
+      <p id="lobby-msg" class="msg"></p>
+      <button id="btn-leave" class="link">← В меню</button>
+      <p class="legal">© 2026 Klivlin. Все права защищены. Неофициальная фанатская версия.</p>
+    </div>
+  </section>
+
+  <section id="game" class="screen page hidden">
+    <header class="bar">
+      <span id="room-info"></span>
+      <div id="threat" class="threat" title="Угроза: когда шкала заполнится — поражение"></div>
+      <span id="deck-info" class="muted"></span>
+      <span class="bar-r">
+        <button class="theme-toggle icon" title="Сменить тему">🌙</button>
+        <button id="btn-menu" class="link">Меню</button>
+      </span>
+    </header>
+    <div id="net-banner" class="hidden"></div>
+    <div class="layout">
+      <main class="table">
+        <div id="turn-info" class="turn-info"></div>
+        <div id="row" class="monsters"></div>
+        <div class="tray">
+          <div id="dice" class="dice"></div>
+          <div class="tray-btns">
+            <button id="btn-roll" class="primary">🎲 Бросить кубики</button>
+            <button id="btn-reroll">⟳ Перебросить выбранные</button>
+            <button id="btn-pass" class="danger">Никого не победить — передать ход</button>
+          </div>
+        </div>
+        <div id="prompt" class="prompt hidden"></div>
+        <p id="game-msg" class="msg"></p>
+      </main>
+      <aside class="side">
+        <div id="players"></div>
+        <section id="chat" class="hidden">
+          <div id="reacts" class="reacts"></div>
+          <ol id="chat-list"></ol>
+          <form id="chat-form" class="row">
+            <input id="chat-input" maxlength="200" placeholder="Сообщение…" autocomplete="off">
+            <button title="Отправить">➤</button>
+          </form>
+        </section>
+        <details class="log-box" open>
+          <summary>Журнал похода</summary>
+          <ol id="log"></ol>
+        </details>
+        <details class="rules"></details>
+        <p class="legal">© 2026 Klivlin · неофициальная фанатская версия</p>
+      </aside>
+    </div>
+    <div id="final" class="overlay hidden">
+      <div class="card">
+        <h1 id="final-title"></h1>
+        <p id="final-text"></p>
+        <ul id="final-list" class="plist"></ul>
+        <button id="btn-again" class="primary">Сыграть ещё раз</button>
+        <button id="btn-close-final">Посмотреть стол</button>
+      </div>
+    </div>
+  </section>
+  <script type="module" src="js/main.js?v=1"></script>
+</body>
+</html>
