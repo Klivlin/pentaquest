@@ -1,5 +1,5 @@
 // Логика кооперативной партии. Чистые функции над состоянием — работают и в браузере, и в Node.
-import { CARDS, BOSS_REQ, MIRROR, matches, ABILITIES } from './cards.js?v=1';
+import { CARDS, BOSS_REQ, MIRROR, matches, ABILITIES } from './cards.js?v=2';
 
 // Баланс подобран симуляцией (test/sim.mjs): боты выигрывают ~99% / ~65% / ~20% / ~6%.
 export const DIFFS = {

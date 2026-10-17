@@ -1,7 +1,7 @@
 // Симуляция партий: случайные игроки (проверка устойчивости) и «разумные» боты (баланс сложности).
 // Запуск: node test/sim.mjs [партий на режим]
-import { newGame, act, matching, total, reqOf, DIFFS, furyLeft, score, D } from '../js/game.js?v=1';
-import { CARDS, matches } from '../js/cards.js?v=1';
+import { newGame, act, matching, total, reqOf, DIFFS, furyLeft, score, D } from '../js/game.js?v=2';
+import { CARDS, matches } from '../js/cards.js?v=2';
 import assert from 'node:assert/strict';
 
 function rng(seed) {

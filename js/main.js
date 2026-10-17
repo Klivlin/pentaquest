@@ -1,7 +1,8 @@
-import { CARDS, ABILITIES, matches, reqText } from './cards.js?v=1';
-import { newGame, act, matching, reqOf, furyLeft, score, D, DIFFS, DIFF_DESC, MAX_PLAYERS, COLORS } from './game.js?v=1';
-import { dieSVG, reqHTML, monsterSVG, HEART, SKULL } from './art.js?v=1';
-import * as net from './net.js?v=1';
+import { CARDS, ABILITIES, matches, reqText } from './cards.js?v=2';
+import { newGame, act, matching, reqOf, furyLeft, score, D, DIFFS, DIFF_DESC, MAX_PLAYERS, COLORS } from './game.js?v=2';
+import { dieSVG, reqHTML, HEART, SKULL } from './art.js?v=2';
+import { DEFS, monsterArt } from './bestiary.js?v=2';
+import * as net from './net.js?v=2';
 
 const $ = s => document.querySelector(s);
 const store = {
@@ -529,7 +530,7 @@ function renderTable() {
     if (g) b.style.setProperty('--gc', g.color);
     const req = reqOf(s, r.c);
     const ab = c.ab ? ABILITIES[c.ab] : null;
-    b.innerHTML = monsterSVG(r.c) +
+    b.innerHTML = monsterArt(r.c, c.name) +
       (ab ? `<span class="ab" title="${ab.name}: ${ab.desc}">${ab.icon}</span>` : '') +
       (c.boss ? `<span class="hp">${HEART.repeat(s.bossHp)}</span>` : '') +
       `<span class="nm">${esc(c.name)}</span>${reqHTML(req)}` +
@@ -709,5 +710,6 @@ window.addEventListener('keydown', e => {
 // Раз в несколько секунд обновляем отметки «в сети».
 setInterval(() => { if (app.kind === 'online') update(); }, 5000);
 
+document.body.insertAdjacentHTML('afterbegin', DEFS);
 initChat();
 initMenu();

@@ -120,8 +120,12 @@ summary { cursor: pointer; }
   position: relative; background: var(--card); border-radius: 12px; overflow: hidden; border: 2px solid transparent;
   box-shadow: 0 4px 14px var(--shadow); display: flex; flex-direction: column; text-align: center; padding: 0;
   transition: transform .15s, border-color .15s, box-shadow .15s; color: var(--ink); cursor: default; font: inherit;
+  background: #f3e7c9; color: #2a1e14;
 }
-.mcard .monster { display: block; width: 100%; aspect-ratio: 1 / .8; }
+.mcard .nm { font-family: Georgia, "Times New Roman", serif; }
+.mcard .req.run small { color: #6b5a44; }
+.mcard .fury i { background: #d6c39c; }
+.mcard .monster { display: block; width: 100%; aspect-ratio: 1 / .8; object-fit: cover; border-bottom: 1px solid #2a1e1455; }
 .mcard .nm { font-weight: 700; font-size: 13px; padding: 4px 4px 0; line-height: 1.2; min-height: 2.4em; display: flex; align-items: center; justify-content: center; }
 .mcard .req { display: flex; justify-content: center; align-items: center; gap: 2px; padding: 4px; flex-wrap: wrap; min-height: 30px; }
 .mcard .ab { position: absolute; top: 6px; right: 6px; background: var(--accent); color: #fff; font-weight: 800; font-size: 13px; border-radius: 8px; padding: 1px 6px; box-shadow: 0 2px 6px #0005; }
@@ -135,7 +139,8 @@ summary { cursor: pointer; }
 .mcard.can::after { content: '⚔ Победить'; position: absolute; left: 0; right: 0; bottom: 0; background: var(--good); color: #fff; font-size: 12px; font-weight: 700; padding: 2px 0 3px; }
 .mcard.ok { border-color: var(--good); }
 .mcard.ghost { outline: 3px dashed var(--gc, #888); outline-offset: 2px; }
-.mcard.boss { background: linear-gradient(#2d1f45, #1d142c); color: #f3e9ff; }
+.mcard.boss { background: linear-gradient(#3a2440, #24162a); color: #f3e9ff; }
+.mcard.boss .fury i { background: #5a4060; }
 .mcard .hp { position: absolute; left: 6px; top: 6px; display: flex; gap: 1px; }
 .mcard .hp .sym { width: 16px; height: 16px; fill: #ff4d6d; }
 .mcard.enter { animation: enter .45s ease-out; }
